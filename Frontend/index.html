@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hierarchy Manager – Super Admin</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside id="sidebar">
+  <div class="brand">
+    <div class="brand-logo">gk</div>
+    <span class="brand-name">Super Admin</span>
+  </div>
+  <nav>
+    <button class="nav-item" data-nav="dashboard"><span class="nav-icon">⊞</span> Dashboard</button>
+    <button class="nav-item active" data-nav="hierarchy"><span class="nav-icon">⊟</span> Hierarchy Management</button>
+    <button class="nav-item" data-nav="users"><span class="nav-icon">👥</span> User Management</button>
+    <button class="nav-item" data-nav="schemes"><span class="nav-icon">🏛</span> Scheme Management</button>
+    <button class="nav-item" data-nav="forms"><span class="nav-icon">📄</span> Forms Management</button>
+    <button class="nav-item" data-nav="routes"><span class="nav-icon">↗</span> Routes management</button>
+  </nav>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div id="main">
+  <header id="topbar">
+    <h1>Hierarchy Manager</h1>
+    <div class="topbar-right">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search-input" type="text" placeholder="Search hierarchy..." oninput="onSearch(this.value)" />
+      </div>
+      <span class="bell">🔔</span>
+      <div class="avatar">A</div>
+    </div>
+  </header>
+
+  <div id="content">
+    <!-- Stat Cards -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">TOTAL REGIONS</div>
+          <div class="stat-value" id="stat-regions">2</div>
+          <div class="stat-sub" style="color:#2E7D32">↗ Stable Infrastructure</div>
+        </div>
+        <span class="stat-icon">🌐</span>
+      </div>
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">TOTAL CLUSTERS</div>
+          <div class="stat-value" id="stat-clusters">6</div>
+          <div class="stat-sub" style="color:#1565C0" id="stat-clusters-sub">ℹ Average 3 per Region</div>
+        </div>
+        <span class="stat-icon">⬡</span>
+      </div>
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">TOTAL BRANCHES</div>
+          <div class="stat-value" id="stat-branches">24</div>
+          <div class="stat-sub" style="color:#0A87D1">⚡ Active Operational Nodes</div>
+        </div>
+        <span class="stat-icon">🏢</span>
+      </div>
+    </div>
+
+    <!-- Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="tab-group">
+          <button class="tab-btn active" onclick="switchTab('regions')">Regions</button>
+          <button class="tab-btn" onclick="switchTab('clusters')">Clusters</button>
+          <button class="tab-btn" onclick="switchTab('branches')">Branches</button>
+        </div>
+        <div class="panel-actions">
+          <select class="filter-sel hidden" id="region-filter" onchange="renderTable()">
+            <option value="all">All Regions</option>
+          </select>
+          <button class="btn-add" id="add-btn" onclick="openAdd()">+ Add Region</button>
+        </div>
+      </div>
+
+      <!-- Table container -->
+      <div id="table-container"></div>
+
+      <div class="panel-footer">
+        <span class="footer-info" id="footer-info"></span>
+        <div class="pagination">
+          <button class="page-btn">‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="onOverlayClick(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modal-title">Add New Region</div>
+        <div class="modal-sub" id="modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" id="modal-submit" onclick="submitModal()">Add Region →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+</body>
+</html>
