@@ -1,4 +1,3 @@
-
 // ══════════════════════════════════════
 //  DATA
 // ══════════════════════════════════════
@@ -43,7 +42,8 @@ function statusBadge(s) {
 function updateStats() {
   document.getElementById('stat-regions').textContent = regions.length;
   document.getElementById('stat-clusters').textContent = clusters.length;
-  document.getElementById('stat-branches').textContent = branches.length;
+  const clusterBranchTotal = clusters.reduce((sum, item) => sum + (parseInt(item.branches, 10) || 0), 0);
+  document.getElementById('stat-branches').textContent = clusterBranchTotal || branches.length;
   const avg = regions.length ? (clusters.length / regions.length).toFixed(0) : 0;
   document.getElementById('stat-clusters-sub').textContent = 'ℹ Average ' + avg + ' per Region';
 }
@@ -136,27 +136,25 @@ function renderRegions(container) {
     !searchVal || r.name.toLowerCase().includes(searchVal) || r.fullName.toLowerCase().includes(searchVal)
   );
   if (!filtered.length) { container.innerHTML = '<div class="empty-state">No regions found.</div>'; setFooter(0, 0, 'regions'); return; }
-  let html = `<table><thead><tr>
-    <th>REGION NAME</th><th>HIERARCHY STATS</th><th>PERFORMANCE</th><th>STATUS</th><th>ACTIONS</th>
+  // ✅ CHANGE TO THIS — delete <th>PERFORMANCE</th>
+let html = `<table><thead><tr>
+    <th>REGION NAME</th><th>HIERARCHY STATS</th><th>STATUS</th><th>ACTIONS</th>
   </tr></thead><tbody>`;
   filtered.forEach(r => {
     html += `<tr>
       <td><div style="display:flex;align-items:center;gap:12px">
-        <div class="region-icon">🗺</div>
+        <div class="region-icon"><i class="fa-solid fa-location-dot"></i></div>
         <div><div class="region-name">${escHtml(r.name)}</div><div class="region-sub">${escHtml(r.fullName)}</div></div>
       </div></td>
       <td><div class="stat-pair">
         <div class="stat-pair-item"><div class="stat-pair-num">${r.clusters}</div><div class="stat-pair-lbl">CLUSTERS</div></div>
         <div class="stat-pair-item"><div class="stat-pair-num">${r.branches}</div><div class="stat-pair-lbl">BRANCHES</div></div>
       </div></td>
-      <td>
-        <div class="progress-bar"><div class="progress-fill" style="width:${r.efficiency}%"></div></div>
-        <div class="progress-label">${r.efficiency}% Efficiency</div>
-      </td>
+      
       <td>${statusBadge(r.status)}</td>
       <td><div style="display:flex;gap:8px">
-        <button class="btn-edit" onclick="openEdit('region','${r.id}')">✏ Edit</button>
-        <button class="btn-del" onclick="deleteItem('region','${r.id}')">🗑 Delete</button>
+        <button class="btn-edit" onclick="openEdit('region','${r.id}')"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+        <button class="btn-del" onclick="deleteItem('region','${r.id}')"><i class="fa-regular fa-trash-can"></i> Delete</button>
       </div></td>
     </tr>`;
   });
@@ -183,9 +181,9 @@ function renderClusters(container, regionFilter) {
       <td style="font-weight:700;font-size:15px;color:#0D1B2A">${String(c.branches).padStart(2,'0')}</td>
       <td>${statusBadge(c.status)}</td>
       <td><div style="display:flex;gap:8px">
-        <button class="icon-btn" title="Stats" onclick="showToast('Stats coming soon')">📊</button>
-        <button class="icon-btn" title="Delete" onclick="deleteItem('cluster','${c.id}')">🗑</button>
-        <button class="icon-btn" title="Edit" onclick="openEdit('cluster','${c.id}')">✏</button>
+        <button class="icon-btn" title="Stats" onclick="showToast('Stats coming soon')"><i class="fa-solid fa-chart-simple"></i></button>
+        <button class="icon-btn" title="Delete" onclick="deleteItem('cluster','${c.id}')"><i class="fa-regular fa-trash-can"></i></button>
+        <button class="icon-btn" title="Edit" onclick="openEdit('cluster','${c.id}')"><i class="fa-solid fa-pen"></i></button>
       </div></td>
     </tr>`;
   });
@@ -210,6 +208,7 @@ function renderBranches(container, regionFilter) {
   html += `<table><thead><tr>
     <th>NAME</th><th>CODE</th><th>CLUSTER</th><th>LOCATION</th><th>STATUS</th><th>ACTIONS</th>
   </tr></thead><tbody>`;
+
   paged.forEach(b => {
     html += `<tr>
       <td style="font-size:14px;color:#0D1B2A;">${escHtml(b.name)}</td>
@@ -218,9 +217,9 @@ function renderBranches(container, regionFilter) {
       <td style="font-size:13.5px;color:#374151">${escHtml(b.location||'—')}</td>
       <td>${statusBadge(b.status)}</td>
       <td><div style="display:flex;gap:6px;align-items:center">
-        <button class="icon-btn" title="Edit" onclick="openEdit('branch','${b.id}')">✏</button>
+        <button class="icon-btn" title="Edit" onclick="openEdit('branch','${b.id}')"><i class="fa-solid fa-pen"></i></button>
         <button class="icon-btn" title="Details" onclick="showToast('Branch details coming soon')">☰</button>
-        <button class="icon-btn" title="Delete" onclick="deleteItem('branch','${b.id}')">🗑</button>
+        <button class="icon-btn" title="Delete" onclick="deleteItem('branch','${b.id}')"><i class="fa-regular fa-trash-can"></i></button>
       </div></td>
     </tr>`;
   });
@@ -232,7 +231,7 @@ function renderBranches(container, regionFilter) {
 }
 function updateBranchFooter(start, end, total, totalPages, page) {
   document.getElementById('footer-info').innerHTML =
-    `Showing <strong>${start}-${end}</strong> of <strong>${total}</strong> branches`;
+    `Showing <strong>${start}-${end}</strong> of <strong>24</strong> branches`;
   let pag = `<button class="page-btn" onclick="changeBranchPage(${page-1})" ${page<=1?'disabled':''}>&#8249;</button>`;
   for (let i=1;i<=totalPages;i++) pag += `<button class="page-btn${i===page?' active':''}" onclick="changeBranchPage(${i})">${i}</button>`;
   pag += `<button class="page-btn" onclick="changeBranchPage(${page+1})" ${page>=totalPages?'disabled':''}>&#8250;</button>`;
@@ -287,32 +286,33 @@ function setupRegionModal(item) {
     <div class="form-group">
       <label class="form-label">FULL NAME / DESCRIPTION</label>
       <input class="form-input" id="f-fullname" placeholder="e.g. Eastern Hub District" value="${escHtml(item?item.fullName:'')}"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">EFFICIENCY (%)</label>
-      <input class="form-input" id="f-efficiency" type="number" min="0" max="100" placeholder="85" value="${item?item.efficiency:''}"/>
     </div>`;
   openModal();
 }
 
 function setupClusterModal(item) {
   modalMode = item ? 'edit-cluster' : 'add-cluster';
-  document.getElementById('modal-title').textContent = item ? 'Edit Cluster' : 'Add New Cluster';
-  document.getElementById('modal-sub').textContent = item ? 'Update cluster details.' : 'Initialize a new cluster within a region.';
-  document.getElementById('modal-submit').textContent = item ? 'Save Changes →' : 'Add Cluster →';
+  document.getElementById('modal-title').textContent = item ? 'Edit Cluster' : 'Create New Cluster';
+  document.getElementById('modal-sub').textContent = item ? 'Update cluster details.' : 'Define a new architectural node within the hierarchy.';
+  document.getElementById('modal-submit').textContent = item ? 'Save Changes →' : 'Create Cluster';
   const regionOpts = regions.map(r => `<option value="${escHtml(r.name)}"${item && item.region===r.name?' selected':''}>${escHtml(r.name)}</option>`).join('');
   document.getElementById('modal-body').innerHTML = `
-    <div class="form-group">
-      <label class="form-label">CLUSTER NAME</label>
-      <input class="form-input" id="f-name" placeholder="e.g. Tiger" value="${escHtml(item?item.name:'')}"/>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">CLUSTER NAME</label>
+        <input class="form-input" id="f-name" placeholder="e.g. Hyderabad East" value="${escHtml(item?item.name:'')}"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">CLUSTER ID</label>
+        <input class="form-input" id="f-code" placeholder="CL-00X" value="${escHtml(item?item.code:'')}"/>
+      </div>
     </div>
     <div class="form-group">
-      <label class="form-label">PARENT REGION</label>
-      <select class="form-select" id="f-region"><option value="">Select Region</option>${regionOpts}</select>
+      <label class="form-label">SELECT REGION</label>
+      <select class="form-select" id="f-region"><option value="">Select a region</option>${regionOpts}</select>
     </div>`;
   openModal();
 }
-
 function setupBranchModal(item) {
   modalMode = item ? 'edit-branch' : 'add-branch';
   document.getElementById('modal-title').textContent = item ? 'Edit Branch' : 'Add New Branch';
@@ -326,10 +326,12 @@ function setupBranchModal(item) {
       <input class="form-input" id="f-name" placeholder="e.g. Asnagar" value="${escHtml(item?item.name:'')}"/>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">BRANCH ID / CODE</label>
-        <div class="form-readonly">${autoId}</div>
-      </div>
+
+<div class="form-group">
+  <label class="form-label">BRANCH ID / CODE</label>
+  <input class="form-input" id="f-branchid" placeholder="BR-007" 
+    value="${escHtml(autoId)}" style="background:#F8FAFC;"/>
+</div>
       <div class="form-group">
         <label class="form-label">PARENT CLUSTER</label>
         <select class="form-select" id="f-cluster"><option value="">Select Cluster</option>${clusterOpts}</select>
@@ -356,31 +358,34 @@ function submitModal() {
   if (modalMode === 'add-region') {
     const name = document.getElementById('f-name').value.trim();
     const fullName = document.getElementById('f-fullname').value.trim();
-    const efficiency = parseInt(document.getElementById('f-efficiency').value) || 0;
+    
     if (!name) { alert('Region name is required.'); return; }
     const id = name.toUpperCase().slice(0,5).replace(/\s/g,'') + '_' + Date.now();
-    regions.push({ id, name, fullName, clusters:0, branches:0, efficiency, status:'ACTIVE' });
+    regions.push({ id, name, fullName, clusters:0, branches:0, efficiency:0, status:'ACTIVE' });
     showToast('Region added!');
   } else if (modalMode === 'edit-region') {
     const r = regions.find(x => x.id === editId);
     if (r) {
       r.name = document.getElementById('f-name').value.trim() || r.name;
       r.fullName = document.getElementById('f-fullname').value.trim();
-      r.efficiency = parseInt(document.getElementById('f-efficiency').value) || r.efficiency;
+      
     }
     showToast('Region updated!');
-  } else if (modalMode === 'add-cluster') {
+  // ✅ NEW CODE — replace with this
+} else if (modalMode === 'add-cluster') {
     const name = document.getElementById('f-name').value.trim();
+    const code = document.getElementById('f-code').value.trim();
     const region = document.getElementById('f-region').value;
-    if (!name || !region) { alert('Name and Region are required.'); return; }
-    const rid = region.slice(0,3).toUpperCase();
-    const id = rid + '-' + name.toUpperCase().slice(0,3) + Date.now().toString().slice(-3);
-    clusters.push({ id, name, code:id, region, branches:0, status:'Active' });
-    showToast('Cluster added!');
-  } else if (modalMode === 'edit-cluster') {
+    if (!name) { alert('Cluster name is required.'); return; }
+    if (!region) { alert('Please select a region.'); return; }
+    const id = code || (region.slice(0,3).toUpperCase() + '-' + name.toUpperCase().slice(0,3) + Date.now().toString().slice(-3));
+    clusters.push({ id, name, code: code || id, region, branches:0, status:'Active' });
+    showToast('Cluster created!');
+} else if (modalMode === 'edit-cluster') {
     const c = clusters.find(x => x.id === editId);
     if (c) {
       c.name = document.getElementById('f-name').value.trim() || c.name;
+      c.code = document.getElementById('f-code').value.trim() || c.code;
       c.region = document.getElementById('f-region').value || c.region;
     }
     showToast('Cluster updated!');
@@ -388,15 +393,17 @@ function submitModal() {
     const name = document.getElementById('f-name').value.trim();
     const cluster = document.getElementById('f-cluster').value;
     const location = document.getElementById('f-location').value.trim();
+     const manualId = document.getElementById('f-branchid').value.trim();
     if (!name || !cluster) { alert('Name and Cluster are required.'); return; }
     const cl = clusters.find(c => c.id === cluster);
-    const id = cluster + '-B' + (branches.filter(b=>b.cluster===cluster).length+1);
+        const id = manualId || (cluster + '-B' + (branches.filter(b=>b.cluster===cluster).length+1));
     branches.push({ id, name, branchId:id, cluster, clusterName: cl?cl.name:cluster, region: cl?cl.region:'', location, status:'Active' });
     showToast('Branch added!');
   } else if (modalMode === 'edit-branch') {
     const b = branches.find(x => x.id === editId);
     if (b) {
       b.name = document.getElementById('f-name').value.trim() || b.name;
+            b.branchId = document.getElementById('f-branchid').value.trim() || b.branchId;
       b.cluster = document.getElementById('f-cluster').value || b.cluster;
       b.location = document.getElementById('f-location').value.trim();
       const cl = clusters.find(c => c.id === b.cluster);
