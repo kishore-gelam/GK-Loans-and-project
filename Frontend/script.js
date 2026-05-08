@@ -180,10 +180,10 @@ function renderClusters(container, regionFilter) {
       <td><span class="region-dot"><span class="rdot" style="background:${regionColor(c.region)}"></span>${escHtml(c.region)}</span></td>
       <td style="font-weight:700;font-size:15px;color:#0D1B2A">${String(c.branches).padStart(2,'0')}</td>
       <td>${statusBadge(c.status)}</td>
+    
       <td><div style="display:flex;gap:8px">
-        <button class="icon-btn" title="Stats" onclick="showToast('Stats coming soon')"><i class="fa-solid fa-chart-simple"></i></button>
-        <button class="icon-btn" title="Delete" onclick="deleteItem('cluster','${c.id}')"><i class="fa-regular fa-trash-can"></i></button>
-        <button class="icon-btn" title="Edit" onclick="openEdit('cluster','${c.id}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn-edit" onclick="openEdit('cluster','${c.id}')">Edit <i class="fa-solid fa-pen"></i></button>
+        <button class="btn-del" onclick="deleteItem('cluster','${c.id}')"><i class="fa-regular fa-trash-can"></i> Delete</button>
       </div></td>
     </tr>`;
   });
@@ -206,7 +206,12 @@ function renderBranches(container, regionFilter) {
   if (!filtered.length) { container.innerHTML = '<div class="empty-state">No branches found.</div>'; updateBranchFooter(0,0,0,1,1); return; }
   let html = `<div style="padding:20px 20px 8px;font-size:17px;font-weight:700;color:#0D1B2A;border-bottom:1px solid #F3F4F6;">Branches List</div>`;
   html += `<table><thead><tr>
-    <th>NAME</th><th>CODE</th><th>CLUSTER</th><th>LOCATION</th><th>STATUS</th><th>ACTIONS</th>
+    <th>NAME</th>
+    <th>CODE</th>
+    <th>CLUSTER</th>
+    <th>LOCATION</th>
+    <th>STATUS</th>
+    <th>ACTIONS</th>
   </tr></thead><tbody>`;
 
   paged.forEach(b => {
@@ -217,10 +222,9 @@ function renderBranches(container, regionFilter) {
       <td style="font-size:13.5px;color:#374151">${escHtml(b.location||'—')}</td>
       <td>${statusBadge(b.status)}</td>
       <td><div style="display:flex;gap:6px;align-items:center">
-        <button class="icon-btn" title="Edit" onclick="openEdit('branch','${b.id}')"><i class="fa-solid fa-pen"></i></button>
-        <button class="icon-btn" title="Details" onclick="showToast('Branch details coming soon')">☰</button>
-        <button class="icon-btn" title="Delete" onclick="deleteItem('branch','${b.id}')"><i class="fa-regular fa-trash-can"></i></button>
-      </div></td>
+        <button class="btn-edit" onclick="openEdit('cluster','${c.id}')">Edit <i class="fa-solid fa-pen"></i></button>
+        <button class="btn-del" onclick="deleteItem('cluster','${c.id}')"><i class="fa-regular fa-trash-can"></i> Delete</button>
+        </div></td>
     </tr>`;
   });
   html += '</tbody></table>';
